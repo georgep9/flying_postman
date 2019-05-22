@@ -9,7 +9,6 @@ namespace Flying_Postman
     class TourMath
     {
         
-
         public static double CalculateDistance(Station firstStation, Station secondStation)
         {
             int x0 = firstStation.StationX();
@@ -23,9 +22,9 @@ namespace Flying_Postman
         public static double CalculateTravelTime(Station firstStation, Station secondStation, Plane plane)
         {
             double distance = CalculateDistance(firstStation, secondStation);
-            int speed = plane.GetSpeed();
-            int takeOffTime = plane.GetTakeOffTime();
-            int landingTime = plane.GetLandingTime();
+            int speed = plane.Speed;
+            int takeOffTime = plane.TakeOffTime;
+            int landingTime = plane.LandingTime;
             double travelTime = ((distance / speed) * 60 + takeOffTime + landingTime);
             return travelTime;
         }

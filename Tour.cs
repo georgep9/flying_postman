@@ -29,10 +29,10 @@ namespace Flying_Postman
             itinerary = new Itinerary("1");
 
             double range = plane.Range;
-            int speed = plane.GetSpeed();
-            int takeOffTime = plane.GetTakeOffTime();
-            int landingTime = plane.GetLandingTime();
-            int refuelTime = plane.GetRefuelTime();
+            int speed = plane.Speed;
+            int takeOffTime = plane.TakeOffTime;
+            int landingTime = plane.LandingTime;
+            int refuelTime = plane.RefuelTime;
 
             double previousTime = initialTimeMinutes;
 

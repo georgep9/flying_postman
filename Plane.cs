@@ -8,11 +8,11 @@ namespace Flying_Postman
 {
     class Plane
     {
-        private readonly int _planeRange;
-        private readonly int _speed;
-        private readonly int _takeOffTime;
-        private readonly int _landingTime;
-        private readonly int _refuelTime;
+        private int _planeRange;
+        private int _speed;
+        private int _takeOffTime;
+        private int _landingTime;
+        private int _refuelTime;
 
         public Plane(int range, int speed, int takeOffTime, int landingTime, int refuelTime)
         {
@@ -25,10 +25,10 @@ namespace Flying_Postman
         }
 
         public double Range { get; set; }
-        public int GetSpeed() { return _speed; }
-        public int GetTakeOffTime() { return _takeOffTime; }
-        public int GetLandingTime() { return _landingTime; }
-        public int GetRefuelTime() { return _refuelTime; }
+        public int Speed { get { return _speed; } }
+        public int TakeOffTime { get { return _takeOffTime; } }
+        public int LandingTime { get { return _landingTime; } }
+        public int RefuelTime { get { return _refuelTime; } }
 
         public void DisplaySpecs()
         {
