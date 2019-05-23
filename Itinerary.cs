@@ -17,7 +17,7 @@ namespace Flying_Postman
         {
             _itineraryStartLog = new List<string>();
             _tourTripLog = new List<string>();
-            string startingLine = "Optimising tour length: Level " + level;
+            string startingLine = "Optimising tour length: Level " + level + "...";
             _itineraryStartLog.Add(startingLine);
         }
         
@@ -35,6 +35,8 @@ namespace Flying_Postman
 
         public void SaveItinerary(string fileName)
         {
+            Console.WriteLine("Saving itinerary to " + fileName);
+
             FileStream outFile = new FileStream(fileName, FileMode.Create, FileAccess.Write);
             StreamWriter writer = new StreamWriter(outFile);
             foreach (string log in _itineraryStartLog)
@@ -49,9 +51,10 @@ namespace Flying_Postman
             outFile.Close();
         }
 
-        public void AddElapsedTimeLog(long elapsedTime)
+        public void AddElapsedTimeLog(double elapsedMilliseconds)
         {
-            string log = "Elapsed time: " + elapsedTime.ToString() + " seconds.";
+            double elapsedSeconds = elapsedMilliseconds / 1000;
+            string log = "Elapsed time: " + elapsedSeconds.ToString() + " seconds";
             _itineraryStartLog.Add(log);
         }
 
@@ -59,12 +62,13 @@ namespace Flying_Postman
         {
             int hours = (int)(tourTime / 60);
             int minutes = (int)(tourTime % 60);
-            string log = "Tour time: " + Convert.ToString(hours) + " Hours " + Convert.ToString(minutes) + " Minutes.";
+            string log = "Tour time: " + Convert.ToString(hours) + " hours " + Convert.ToString(minutes) + " minutes";
             _itineraryStartLog.Add(log);
         }
 
         public void AddTourLengthLog(double tourLength)
         {
+            tourLength = Math.Round(tourLength, 3);
             string log = "Tour length: " + Convert.ToString(tourLength);
             _itineraryStartLog.Add(log);
         }

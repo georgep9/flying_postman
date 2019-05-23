@@ -6,15 +6,15 @@ using System.Threading.Tasks;
 
 namespace Flying_Postman
 {
-    class TourMath
+    struct TourMath
     {
         
         public static double CalculateDistance(Station firstStation, Station secondStation)
         {
-            int x0 = firstStation.StationX();
-            int y0 = firstStation.StationY();
-            int x1 = secondStation.StationX();
-            int y1 = secondStation.StationY();
+            int x0 = firstStation.StationX;
+            int y0 = firstStation.StationY;
+            int x1 = secondStation.StationX;
+            int y1 = secondStation.StationY;
             double distance = Math.Sqrt(Math.Pow(x1 - x0, 2) + Math.Pow(y1 - y0, 2));
             return distance;
         }
@@ -26,6 +26,7 @@ namespace Flying_Postman
             int takeOffTime = plane.TakeOffTime;
             int landingTime = plane.LandingTime;
             double travelTime = ((distance / speed) * 60 + takeOffTime + landingTime);
+            travelTime = Math.Round(travelTime);
             return travelTime;
         }
 
@@ -64,21 +65,19 @@ namespace Flying_Postman
             return totalMinutes;
         }
 
-        public static double CalculateTourLength(List<Station> stations)
+        public static double CalculateSumDistances(List<double> distances)
         {
-            double tourLength = 0;
-            double distanceBetween;
-            for (int i = 1; i < stations.Count(); i++)
+            double sum = 0;
+            foreach (double distance in distances)
             {
-                distanceBetween = CalculateDistance(stations[i - 1], stations[i]);
-                tourLength += distanceBetween;
+                sum += distance;
             }
-            return tourLength;
+            return sum;
         }
         
     }
 
-    class CompareStations
+    struct CompareStations
     {
         private double _distance;
         private double _travelTime;

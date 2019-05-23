@@ -30,8 +30,7 @@ namespace Flying_Postman
             if (outputArg == "-o")
             {
                 string fileName = args[4];
-                Itinerary itinerary = tour.ReturnItinerary();
-                itinerary.SaveItinerary(fileName);
+                tour.Itinerary.SaveItinerary(fileName);
             }
 
             Console.ReadKey();
@@ -41,6 +40,7 @@ namespace Flying_Postman
         static List<Station> ReadStations(string MAIL)
         {
             // read mail file and create station objects
+            Console.WriteLine("Reading input from " + MAIL);
 
             string lineInMail;
             string[] MAIL_ITEMS;
