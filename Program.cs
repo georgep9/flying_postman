@@ -77,11 +77,11 @@ namespace Flying_Postman
 
             lineInPlane = readerPlane.ReadLine();
             PLANE_SPECS = lineInPlane.Split(DELIM);
-            int range = Convert.ToInt32(PLANE_SPECS[0]);
-            int speed = Convert.ToInt32(PLANE_SPECS[1]);
-            int takeOffTime = Convert.ToInt32(PLANE_SPECS[2]);
-            int landingTime = Convert.ToInt32(PLANE_SPECS[3]);
-            int refuelTime = Convert.ToInt32(PLANE_SPECS[4]);
+            double range = Convert.ToDouble(PLANE_SPECS[0]);
+            double speed = Convert.ToDouble(PLANE_SPECS[1]);
+            double takeOffTime = Convert.ToDouble(PLANE_SPECS[2]);
+            double landingTime = Convert.ToDouble(PLANE_SPECS[3]);
+            double refuelTime = Convert.ToDouble(PLANE_SPECS[4]);
 
             Plane ultraLight = new Plane(range, speed, takeOffTime, landingTime, refuelTime);
             return ultraLight;

@@ -25,7 +25,8 @@ namespace Flying_Postman
             _plane = plane;
 
             _levelSelected = "1";
-            SimpleHeuristic(plane, stations);
+            SimpleHeuristic(stations);
+            ImprovedHeuristic();
             programStopwatch.Stop();
 
             AddStamps(initialTimeMinutes);
@@ -43,12 +44,8 @@ namespace Flying_Postman
                 double rangeToTravel = visitingStation.RangeTravelled;
                 startTime = endTime;
                 if (Math.Round((_plane.Range - rangeToTravel),7) < 0)
-                {
-                    if (visitingStation.Name == "QFB")
-                    {
-                        Console.WriteLine(" {0} {1}", (int)(_plane.Range * 60), (int)(rangeToTravel * 60));
-                        Console.WriteLine(" {0}", (int)(_plane.Range * 60) - (int)(rangeToTravel * 60));
-                    }
+                {Console.WriteLine(" {0}", (int)(_plane.Range * 60) - (int)(rangeToTravel * 60));
+                    
                     _plane.RefuelPlane();
                     visitingStation.Refuel();
                     startTime += _plane.RefuelTime;
@@ -61,7 +58,7 @@ namespace Flying_Postman
         }
 
         // Level 1 Tour
-        public void SimpleHeuristic(Plane plane, List<Station> stations)
+        public void SimpleHeuristic(List<Station> stations)
         {
             _orderedStations.Add(stations[0]); // first station (post office)
             _orderedStations.Add(stations[0]); // last station (post office)
@@ -87,7 +84,7 @@ namespace Flying_Postman
                     disToNext = TourMath.DistanceBetweenStations(selectStation, _orderedStations[i]);
                     double newLength = _tourLength - disPrevBefore + disPrevAdjusted + disToNext;
                     // if this length is smaller than the current shortest
-                    if (newLength < minLength)
+                    if (newLength < minLength )
                     {
                         minLength = newLength; // new shortest length
                         bestPosition = i; // current best position for insert
@@ -105,6 +102,71 @@ namespace Flying_Postman
             _orderedStations.RemoveAt(_orderedStations.Count() - 1);
             
         } 
+
+        public void ImprovedHeuristic()
+        {
+            bool changed = true;
+            double newLength;
+            _orderedStations.Add(_orderedStations[0]); // last station (post office) 
+
+            while (changed)
+            {
+                changed = false;
+                double previousTourLength = _tourLength;
+                newLength = _tourLength;
+                
+
+                for (int i = 1; i < _orderedStations.Count()-1; i++)
+                {
+                    
+                    int bestPosition = i;
+                    double preNewLength = _tourLength;
+
+                    Station selectStation = _orderedStations[i];
+                    preNewLength -= selectStation.Distance;
+                    _orderedStations.RemoveAt(i);
+
+                    preNewLength -= _orderedStations[i - 1].Distance;
+                    _orderedStations[i - 1].NextTo(_orderedStations[i]);
+                    preNewLength += _orderedStations[i - 1].Distance;
+
+                    
+                    for (int n = 1; n < _orderedStations.Count(); n++)
+                    {
+                        newLength = preNewLength;
+
+                        double distAhead = TourMath.DistanceBetweenStations(selectStation, _orderedStations[n]);
+                        newLength += distAhead;
+                        //_orderedStations.Insert(n, selectStation);
+
+                        double prevDistBehind = TourMath.DistanceBetweenStations(_orderedStations[n - 1], _orderedStations[n]);
+                        newLength -= prevDistBehind;
+                        double currentDistBehind = TourMath.DistanceBetweenStations(_orderedStations[n - 1], selectStation);
+                        newLength += currentDistBehind;
+                        
+
+                        if (newLength < _tourLength - 0.000001)
+                        {
+                            bestPosition = n;
+                            _tourLength = newLength;
+                            changed = true;
+                            Console.WriteLine(_tourLength);
+                        }
+                    }
+
+                    _orderedStations[bestPosition - 1].NextTo(selectStation);
+                    selectStation.NextTo(_orderedStations[bestPosition]);
+                    _orderedStations.Insert(bestPosition, selectStation);
+                    
+                }
+                
+
+            }
+            // remove post office from end
+            _orderedStations.RemoveAt(_orderedStations.Count() - 1);
+
+            
+        }
         
         public List<Station> OrderedStations { get { return _orderedStations; } }
         public double TourLength { get { return _tourLength; } }

@@ -100,7 +100,7 @@ namespace Flying_Postman
             
         }
 
-        public void AddRefuelLog(int refuelTime)
+        public void AddRefuelLog(double refuelTime)
         {
             string log = "*** refuel in " + Convert.ToString(refuelTime) + " minutes ***";
             _tourTripLog.Add(log);

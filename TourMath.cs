@@ -27,9 +27,9 @@ namespace Flying_Postman
 
         public static double CalculateTravelTime(double distance, Plane plane)
         {
-            int speed = plane.Speed;
-            int takeOffTime = plane.TakeOffTime;
-            int landingTime = plane.LandingTime;
+            double speed = plane.Speed;
+            double takeOffTime = plane.TakeOffTime;
+            double landingTime = plane.LandingTime;
             double travelTime = ((distance / speed) * 60 + takeOffTime + landingTime);
             travelTime = Math.Round(travelTime);
             return travelTime;
