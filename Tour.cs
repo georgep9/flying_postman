@@ -73,22 +73,21 @@ namespace Flying_Postman
                 Station selectStation = stations[n + 1]; // station to be inserted
 
                 // calculate length of tour when station is insert at N+1 (end)
-                double sumDistancesBefore = TourMath.CalculateSumDistances(_orderedStations.GetRange(0, n));
-                double sumDistancesAfter = 0; // post office to post office = 0
-                double distanceBefore = TourMath.CalculateDistanceStations(_orderedStations[n], selectStation);
-                double distanceAfter = TourMath.CalculateDistanceStations(selectStation, _orderedStations[0]);
-                double minLength = sumDistancesBefore + distanceBefore + distanceAfter; // have length to be 'shortest'
+                double disPrevBefore = TourMath.DistanceBetweenStations(_orderedStations[n], _orderedStations[n+1]);
+                double disPrevAdjusted = TourMath.DistanceBetweenStations(_orderedStations[n], selectStation);
+                double disToNext = TourMath.DistanceBetweenStations(selectStation, _orderedStations[0]);
+                double minLength = _tourLength - disPrevBefore + disPrevAdjusted + disToNext;
                 int bestPosition = n + 1; // position for insert, if in fact shortest length
 
                 // loop through positions up to N+1
                 for (int i = 1; i < n + 1; i++)
                 {
                     // calculate length of tour when station is inserted at each position
-                    sumDistancesBefore = TourMath.CalculateSumDistances(_orderedStations.GetRange(0, i - 1));
-                    sumDistancesAfter = TourMath.CalculateSumDistances(_orderedStations.GetRange(i, n + 1 - i));
-                    distanceBefore = TourMath.CalculateDistanceStations(_orderedStations[i - 1], selectStation);
-                    distanceAfter = TourMath.CalculateDistanceStations(selectStation, _orderedStations[i]);
-                    double newLength = sumDistancesBefore + distanceBefore + distanceAfter + sumDistancesAfter;
+
+                    disPrevBefore = TourMath.DistanceBetweenStations(_orderedStations[i - 1], _orderedStations[i]);
+                    disPrevAdjusted = TourMath.DistanceBetweenStations(_orderedStations[i - 1], selectStation);
+                    disToNext = TourMath.DistanceBetweenStations(selectStation, _orderedStations[i]);
+                    double newLength = _tourLength - disPrevBefore + disPrevAdjusted + disToNext;
                     // if this length is smaller than the current shortest
                     if (newLength < minLength)
                     {

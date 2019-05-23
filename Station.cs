@@ -38,7 +38,7 @@ namespace Flying_Postman
         public void NextTo(Station nextStation)
         {
             _nextStation = nextStation.Name;
-            _distance = TourMath.CalculateDistance(_x, _y, nextStation.X, nextStation.Y);
+            _distance = TourMath.DistanceBetween(_x, _y, nextStation.X, nextStation.Y);
             _travelTime = TourMath.CalculateTravelTime(_distance, _plane);
             _rangeTravelled = _travelTime / 60;
         }

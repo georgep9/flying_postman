@@ -9,19 +9,19 @@ namespace Flying_Postman
     struct TourMath
     {
         
-        public static double CalculateDistance(int x0, int y0, int x1, int y1)
+        public static double DistanceBetween(int x0, int y0, int x1, int y1)
         {
             double distance = Math.Sqrt(Math.Pow(x1 - x0, 2) + Math.Pow(y1 - y0, 2));
             return distance;
         }
 
-        public static double CalculateDistanceStations(Station firstStation, Station secondStation)
+        public static double DistanceBetweenStations(Station firstStation, Station secondStation)
         {
             int x0 = firstStation.X;
             int y0 = firstStation.Y;
             int x1 = secondStation.X;
             int y1 = secondStation.Y;
-            double distance = CalculateDistance(x0, y0, x1, y1);
+            double distance = DistanceBetween(x0, y0, x1, y1);
             return distance;
         }
 
