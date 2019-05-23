@@ -14,30 +14,29 @@ namespace Flying_Postman
         static void Main(string[] args)
         {
 
-            string mailFile = args[0];
-            List<Station> stations = ReadStations(mailFile);
+            
 
 
             string planeFile = args[1];
-            Plane ultraLight = ReadPlane(planeFile);
+            Plane plane = ReadPlane(planeFile);
+
+            string mailFile = args[0];
+            List<Station> stations = ReadStations(mailFile,plane);
 
             string initialTimeStamp = args[2];
             int initialTimeMinutes = TourMath.ConvertToTimeMinutes(initialTimeStamp);
 
-            Tour tour = new Tour(stations, ultraLight, initialTimeMinutes);
+            Tour tour = new Tour(stations, plane, initialTimeMinutes);
 
-            string outputArg = args[3];
-            if (outputArg == "-o")
-            {
-                string fileName = args[4];
-                tour.Itinerary.SaveItinerary(fileName);
-            }
+            Itinerary itinerary = new Itinerary(tour, plane);
+
+            itinerary.PrintItinerary();
 
             Console.ReadKey();
 
         }
 
-        static List<Station> ReadStations(string MAIL)
+        static List<Station> ReadStations(string MAIL,Plane plane)
         {
             // read mail file and create station objects
             Console.WriteLine("Reading input from " + MAIL);
@@ -58,7 +57,7 @@ namespace Flying_Postman
                 name = MAIL_ITEMS[0];
                 x = Convert.ToInt32(MAIL_ITEMS[1]);
                 y = Convert.ToInt32(MAIL_ITEMS[2]);
-                Station station = new Station(name, x, y);
+                Station station = new Station(name, x, y, plane);
                 Stations.Add(station);
                 lineInMail = readerMail.ReadLine();
             }

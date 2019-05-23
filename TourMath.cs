@@ -9,19 +9,24 @@ namespace Flying_Postman
     struct TourMath
     {
         
-        public static double CalculateDistance(Station firstStation, Station secondStation)
+        public static double CalculateDistance(int x0, int y0, int x1, int y1)
         {
-            int x0 = firstStation.StationX;
-            int y0 = firstStation.StationY;
-            int x1 = secondStation.StationX;
-            int y1 = secondStation.StationY;
             double distance = Math.Sqrt(Math.Pow(x1 - x0, 2) + Math.Pow(y1 - y0, 2));
             return distance;
         }
 
-        public static double CalculateTravelTime(Station firstStation, Station secondStation, Plane plane)
+        public static double CalculateDistanceStations(Station firstStation, Station secondStation)
         {
-            double distance = CalculateDistance(firstStation, secondStation);
+            int x0 = firstStation.X;
+            int y0 = firstStation.Y;
+            int x1 = secondStation.X;
+            int y1 = secondStation.Y;
+            double distance = CalculateDistance(x0, y0, x1, y1);
+            return distance;
+        }
+
+        public static double CalculateTravelTime(double distance, Plane plane)
+        {
             int speed = plane.Speed;
             int takeOffTime = plane.TakeOffTime;
             int landingTime = plane.LandingTime;
@@ -65,35 +70,16 @@ namespace Flying_Postman
             return totalMinutes;
         }
 
-        public static double CalculateSumDistances(List<double> distances)
+        public static double CalculateSumDistances(List<Station> stations)
         {
             double sum = 0;
-            foreach (double distance in distances)
+            foreach (Station station in stations)
             {
-                sum += distance;
+                sum += station.Distance;
             }
             return sum;
         }
         
     }
-
-    struct CompareStations
-    {
-        private double _distance;
-        private double _travelTime;
-        private double _rangeTravelled;
-
-        public CompareStations(Station firstStation, Station secondStation, Plane plane)
-        {
-            _distance = TourMath.CalculateDistance(firstStation, secondStation);
-            _travelTime = TourMath.CalculateTravelTime(firstStation, secondStation,plane);
-            _rangeTravelled = _travelTime / 60;
-
-        }
-
-        public double Distance { get { return _distance; } }
-        public double TravelTime { get { return _travelTime; } }
-        public double RangeTravelled { get { return _rangeTravelled; } }
-        
-    }
+    
 }

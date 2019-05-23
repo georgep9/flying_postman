@@ -10,15 +10,26 @@ namespace Flying_Postman
     class Itinerary
     {
 
+        private Tour _tour;
+        private Plane _plane;
+
         private List<string> _itineraryStartLog;
         private List<string> _tourTripLog;
-
-        public Itinerary(string level)
+        
+        public Itinerary(Tour tour, Plane plane)
         {
+            _tour = tour;
+            _plane = plane;
+
             _itineraryStartLog = new List<string>();
             _tourTripLog = new List<string>();
-            string startingLine = "Optimising tour length: Level " + level + "...";
+            
+            string startingLine = "Optimising tour length: Level " + tour.LevelSelected + "...";
             _itineraryStartLog.Add(startingLine);
+            AddElapsedTimeLog(_tour.ElapsedTimeMS);
+            AddTourTimeLog(_tour.TourTime);
+            AddTourLengthLog(_tour.TourLength);
+            AddTourTripsLog(_tour.OrderedStations);
         }
         
         public void PrintItinerary()
@@ -60,9 +71,10 @@ namespace Flying_Postman
 
         public void AddTourTimeLog(double tourTime)
         {
-            int hours = (int)(tourTime / 60);
-            int minutes = (int)(tourTime % 60);
-            string log = "Tour time: " + Convert.ToString(hours) + " hours " + Convert.ToString(minutes) + " minutes";
+            string days = Convert.ToString((int)(tourTime / 60 / 24));
+            string hours = Convert.ToString((int)(tourTime / 60 % 24));
+            string minutes = Convert.ToString((int)(tourTime % 60));
+            string log = "Tour time: " + days + " days " + hours + " hours " + minutes + " minutes";
             _itineraryStartLog.Add(log);
         }
 
@@ -73,10 +85,19 @@ namespace Flying_Postman
             _itineraryStartLog.Add(log);
         }
 
-        public void AddTripLog(string previousStation, string newStation, string previousTimeStamp, string currentTimeStamp)
+        public void AddTourTripsLog(List<Station> orderedStations)
         {
-            string log = previousStation + "\t->\t" + newStation + " \t" + previousTimeStamp + "\t" + currentTimeStamp;
-            _tourTripLog.Add(log);
+            foreach (Station station in orderedStations)
+            {
+                if ( station.Refuels ) { AddRefuelLog(_plane.RefuelTime); }
+                string currentStation = station.Name;
+                string nextStation = station.NextStation;
+                string currentTimeStamp = station.TripStartTimeStamp;
+                string nextTimeStamp = station.TripEndTimeStamp;
+                string log = currentStation + "\t->\t" + nextStation + " \t" + currentTimeStamp + "\t" + nextTimeStamp;
+                _tourTripLog.Add(log);
+            }
+            
         }
 
         public void AddRefuelLog(int refuelTime)
