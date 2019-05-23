@@ -63,7 +63,6 @@ namespace Flying_Postman
         // Level 1 Tour
         public void SimpleHeuristic(Plane plane, List<Station> stations)
         {
-
             _orderedStations.Add(stations[0]); // first station (post office)
             _orderedStations.Add(stations[0]); // last station (post office)
             
@@ -73,7 +72,7 @@ namespace Flying_Postman
                 Station selectStation = stations[n + 1]; // station to be inserted
 
                 // calculate length of tour when station is insert at N+1 (end)
-                double disPrevBefore = TourMath.DistanceBetweenStations(_orderedStations[n], _orderedStations[n+1]);
+                double disPrevBefore = _orderedStations[n].Distance;
                 double disPrevAdjusted = TourMath.DistanceBetweenStations(_orderedStations[n], selectStation);
                 double disToNext = TourMath.DistanceBetweenStations(selectStation, _orderedStations[0]);
                 double minLength = _tourLength - disPrevBefore + disPrevAdjusted + disToNext;
@@ -83,8 +82,7 @@ namespace Flying_Postman
                 for (int i = 1; i < n + 1; i++)
                 {
                     // calculate length of tour when station is inserted at each position
-
-                    disPrevBefore = TourMath.DistanceBetweenStations(_orderedStations[i - 1], _orderedStations[i]);
+                    disPrevBefore = _orderedStations[i - 1].Distance;
                     disPrevAdjusted = TourMath.DistanceBetweenStations(_orderedStations[i - 1], selectStation);
                     disToNext = TourMath.DistanceBetweenStations(selectStation, _orderedStations[i]);
                     double newLength = _tourLength - disPrevBefore + disPrevAdjusted + disToNext;
@@ -101,7 +99,7 @@ namespace Flying_Postman
                 _orderedStations[bestPosition - 1].NextTo(selectStation);
                 _orderedStations[bestPosition].NextTo(_orderedStations[bestPosition + 1]);
 
-                _tourLength = minLength;
+                _tourLength = minLength; // update tour length
             }
             // remove post office from end
             _orderedStations.RemoveAt(_orderedStations.Count() - 1);
