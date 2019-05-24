@@ -42,6 +42,7 @@ namespace Flying_Postman
             _travelTime = TourMath.CalculateTravelTime(_distance, _plane);
             _rangeTravelled = _travelTime / 60;
         }
+        
 
         public void AddTripTimes(double startTime, double endTime)
         {

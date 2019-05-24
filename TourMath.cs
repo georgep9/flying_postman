@@ -31,8 +31,7 @@ namespace Flying_Postman
             double takeOffTime = plane.TakeOffTime;
             double landingTime = plane.LandingTime;
             double travelTime = ((distance / speed) * 60 + takeOffTime + landingTime);
-            travelTime = Math.Round(travelTime);
-            return travelTime;
+            return Math.Round(travelTime);
         }
 
 

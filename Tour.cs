@@ -43,9 +43,8 @@ namespace Flying_Postman
                 double travelTime = visitingStation.TravelTime;
                 double rangeToTravel = visitingStation.RangeTravelled;
                 startTime = endTime;
-                if (Math.Round((_plane.Range - rangeToTravel),7) < 0)
-                {Console.WriteLine(" {0}", (int)(_plane.Range * 60) - (int)(rangeToTravel * 60));
-                    
+                if (_plane.Range - rangeToTravel + 0.00001 < 0)
+                {
                     _plane.RefuelPlane();
                     visitingStation.Refuel();
                     startTime += _plane.RefuelTime;
@@ -60,11 +59,12 @@ namespace Flying_Postman
         // Level 1 Tour
         public void SimpleHeuristic(List<Station> stations)
         {
+
             _orderedStations.Add(stations[0]); // first station (post office)
             _orderedStations.Add(stations[0]); // last station (post office)
             
             // loop through every station of mail
-            for (int n = 0; n < stations.Count() - 1; n++)
+            for (int n = 0; n < stations.Count()-1; n++)
             {
                 Station selectStation = stations[n + 1]; // station to be inserted
 
@@ -84,7 +84,7 @@ namespace Flying_Postman
                     disToNext = TourMath.DistanceBetweenStations(selectStation, _orderedStations[i]);
                     double newLength = _tourLength - disPrevBefore + disPrevAdjusted + disToNext;
                     // if this length is smaller than the current shortest
-                    if (newLength < minLength )
+                    if (newLength < minLength)
                     {
                         minLength = newLength; // new shortest length
                         bestPosition = i; // current best position for insert
@@ -150,7 +150,7 @@ namespace Flying_Postman
                             bestPosition = n;
                             _tourLength = newLength;
                             changed = true;
-                            Console.WriteLine(_tourLength);
+                            Console.WriteLine("{0}", newLength);
                         }
                     }
 
