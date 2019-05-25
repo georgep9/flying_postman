@@ -9,32 +9,35 @@ namespace Flying_Postman
 {
     class Itinerary
     {
-
+        // reference
         private Tour _tour;
         private Plane _plane;
-
-        private List<string> _itineraryStartLog;
-        private List<string> _tourTripLog;
+        
+        private List<string> _itineraryStartLog; // log of messeges before trip is shown
+        private List<string> _tourTripLog; // log of trip
         
         public Itinerary(Tour tour, Plane plane)
         {
-            _tour = tour;
+            _tour = tour; 
             _plane = plane;
 
             _itineraryStartLog = new List<string>();
             _tourTripLog = new List<string>();
-            
+        
             string startingLine = "Optimising tour length: Level " + tour.LevelSelected + "...";
             _itineraryStartLog.Add(startingLine);
+
+            // add tour details to itinerary logs
             AddElapsedTimeLog(_tour.ElapsedTimeMS);
             AddTourTimeLog(_tour.TourTime);
             AddTourLengthLog(_tour.TourLength);
-            AddTourTripsLog(_tour.OrderedStations);
+            AddTourTripsLog(_tour.OrderedStations); // trip
         }
         
+        // Print itinerary logs to console
         public void PrintItinerary()
         {
-            foreach (string log in _itineraryStartLog)
+            foreach (string log in _itineraryStartLog.GetRange(1,_itineraryStartLog.Count()-1))
             {
                 Console.WriteLine(log);
             }
@@ -44,6 +47,7 @@ namespace Flying_Postman
             }
         }
 
+        // save itinerary logs to out file
         public void SaveItinerary(string fileName)
         {
             Console.WriteLine("Saving itinerary to " + fileName);
@@ -62,6 +66,7 @@ namespace Flying_Postman
             outFile.Close();
         }
 
+        // add elapsed time in ms to starting log as seconds
         public void AddElapsedTimeLog(double elapsedMilliseconds)
         {
             double elapsedSeconds = elapsedMilliseconds / 1000;
@@ -69,6 +74,7 @@ namespace Flying_Postman
             _itineraryStartLog.Add(log);
         }
 
+        // add the tour time in minutes to starting log as days, hours, minutes
         public void AddTourTimeLog(double tourTime)
         {
             string days = Convert.ToString((int)(tourTime / 60 / 24));
@@ -78,6 +84,7 @@ namespace Flying_Postman
             _itineraryStartLog.Add(log);
         }
 
+        // add tour length (total distance) to starting log
         public void AddTourLengthLog(double tourLength)
         {
             tourLength = Math.Round(tourLength, 3);
@@ -85,8 +92,10 @@ namespace Flying_Postman
             _itineraryStartLog.Add(log);
         }
 
+        // add each trip of the tour to trip log
         public void AddTourTripsLog(List<Station> orderedStations)
         {
+            // loop through stations to get properties for log
             foreach (Station station in orderedStations)
             {
                 if ( station.Refuels ) { AddRefuelLog(_plane.RefuelTime); }
@@ -100,6 +109,7 @@ namespace Flying_Postman
             
         }
 
+        // add a refuel log to trip log
         public void AddRefuelLog(double refuelTime)
         {
             string log = "*** refuel in " + Convert.ToString(refuelTime) + " minutes ***";

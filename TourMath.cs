@@ -8,13 +8,14 @@ namespace Flying_Postman
 {
     struct TourMath
     {
-        
+        // calculate distance between two coordinates
         public static double DistanceBetween(int x0, int y0, int x1, int y1)
         {
             double distance = Math.Sqrt(Math.Pow(x1 - x0, 2) + Math.Pow(y1 - y0, 2));
             return distance;
         }
 
+        // calulate distance between stations from their properties
         public static double DistanceBetweenStations(Station firstStation, Station secondStation)
         {
             int x0 = firstStation.X;
@@ -25,6 +26,7 @@ namespace Flying_Postman
             return distance;
         }
 
+        // calculate travel time from distance travelled, with taking off and landing times
         public static double CalculateTravelTime(double distance, Plane plane)
         {
             double speed = plane.Speed;
@@ -34,15 +36,9 @@ namespace Flying_Postman
             return Math.Round(travelTime);
         }
 
-
-        public static double CalculateCurrentTime(double previousTime, double travelTime)
-        {
-            return previousTime + travelTime;
-        }
-
+        // convert time in minutes to time stamp, as 24 hour time
         public static string ConvertToTimeStamp(double timeInMinutes)
         {
-
             int hours = (int)(timeInMinutes / 60);
             int minutes = (int)(timeInMinutes % 60);
 
@@ -57,28 +53,50 @@ namespace Flying_Postman
             return stringHours + ":" + stringMinutes;
         }
 
+        // convert 24 hour time stamp string to minutes to minutes in
         public static int ConvertToTimeMinutes(string timeStamp)
         {
             string stringHours = timeStamp.Substring(0, 2);
-            string stringMinutes = timeStamp.Substring(3);
-
+            string stringMinutes = timeStamp.Substring(3, 2);
             int hours = int.Parse(stringHours);
             int minutes = int.Parse(stringMinutes);
-
             int totalMinutes = hours * 60 + minutes;
             return totalMinutes;
         }
 
-        public static double CalculateSumDistances(List<Station> stations)
+        // used for Exhaustive search, assigns next station to each station and sums
+        // the distances accordingly
+        public static double CalculateDistancesAndFindLength(ref List<Station> stations)
         {
-            double sum = 0;
-            foreach (Station station in stations)
+            double length = 0;
+
+            for (int i = 0; i < stations.Count()-1; i++)
             {
-                sum += station.Distance;
+                stations[i].NextTo(stations[i + 1]);
+                length += stations[i].Distance;
             }
-            return sum;
+            stations[stations.Count() - 1].NextTo(stations[1]);
+
+            return length;
         }
-        
+
+        // fix properties of each station in a stations list permutation
+        public static void CleanUpPermutation(ref List<Station> stations)
+        {
+            for (int i = 0; i < stations.Count()-1; i++)
+            {
+                stations[i].NextTo(stations[i + 1]);
+            }
+        }
+
+        // swap stations
+        public static void SwapStations(ref Station station1, ref Station station2)
+        {
+            Station temp = new Station(station1.Name, station1.X, station1.Y, station1.Plane);
+            station1 = new Station(station2.Name, station2.X, station2.Y, station2.Plane);
+            station2 = temp;
+        }
+
     }
     
 }

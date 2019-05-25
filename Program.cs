@@ -13,27 +13,54 @@ namespace Flying_Postman
 
         static void Main(string[] args)
         {
+            if (args.Count() >= 3) // should have 3 or more command line arguments
+            {
+                try
+                {
+                    string planeFile = args[1];
+                    Plane plane = ReadPlane(planeFile); // create plane object
 
-            
+                    string mailFile = args[0];
+                    List<Station> stations = ReadStations(mailFile, plane); // create list of station objects
 
+                    string initialTimeStamp = args[2]; // get initial time and convert to minutes;
+                    int initialTimeMinutes = TourMath.ConvertToTimeMinutes(initialTimeStamp);
 
-            string planeFile = args[1];
-            Plane plane = ReadPlane(planeFile);
+                    Tour tour = new Tour(stations, plane, initialTimeMinutes); // create and optimise a tour
 
-            string mailFile = args[0];
-            List<Station> stations = ReadStations(mailFile,plane);
+                    Itinerary itinerary = new Itinerary(tour, plane); // create intinerary from tour
 
-            string initialTimeStamp = args[2];
-            int initialTimeMinutes = TourMath.ConvertToTimeMinutes(initialTimeStamp);
+                    itinerary.PrintItinerary(); // print itinerary to console
 
-            Tour tour = new Tour(stations, plane, initialTimeMinutes);
-
-            Itinerary itinerary = new Itinerary(tour, plane);
-
-            itinerary.PrintItinerary();
-
-            Console.ReadKey();
-
+                    // if flag given, try to output itinerary to output file
+                    if (args[3] == "-o")
+                    {
+                        try { itinerary.SaveItinerary(args[4]); }
+                        catch { Console.WriteLine("Error: Output file cannot be written to."); }
+                    }
+                    else { Console.WriteLine("Error: Please use '-o' to write itinerary to output file."); }
+                }
+                // handle errors accordingly:
+                catch (FileNotFoundException)
+                {
+                    Console.WriteLine("Error: Mail file or plane file cannot be read or does not exist.");
+                }
+                catch (ArgumentOutOfRangeException)
+                {
+                    Console.WriteLine("Error: Inital time is incorrectly formatted. Please enter as HH:MM.");
+                }
+                catch (IndexOutOfRangeException)
+                {
+                    Console.WriteLine("Error: The provided mail file or plane file cannot be parsed correctly.");
+                }
+            }
+            else // if not, give simple message
+            {
+                Console.WriteLine("Error: Incorrect number of arguements provided.");
+                Console.WriteLine("Please enter arguments in the format: mail_file plane_file HH:MM -o output_file");
+                Console.WriteLine("'-o out_file' is optional.");
+            }
+            Console.ReadKey(); // wait to key press to finish program
         }
 
         static List<Station> ReadStations(string MAIL,Plane plane)
@@ -51,7 +78,7 @@ namespace Flying_Postman
             string name;
             int x, y;
             lineInMail = readerMail.ReadLine();
-            while (lineInMail != null)
+            while (lineInMail != null) // while there are lines, create a station object
             {
                 MAIL_ITEMS = lineInMail.Split(DELIM);
                 name = MAIL_ITEMS[0];
@@ -67,7 +94,7 @@ namespace Flying_Postman
 
         static Plane ReadPlane(string PLANE)
         {
-            // read boeing spec file and create plane object
+            // read plane file and create plane object
 
             string lineInPlane;
             string[] PLANE_SPECS;

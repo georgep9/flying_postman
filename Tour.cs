@@ -18,31 +18,45 @@ namespace Flying_Postman
         
         public Tour(List<Station> stations, Plane plane, double initialTimeMinutes)
         {
-            var programStopwatch = System.Diagnostics.Stopwatch.StartNew();
-
+            
             _orderedStations = new List<Station>();
             _tourTime = 0;
             _plane = plane;
 
-            _levelSelected = "1";
-            SimpleHeuristic(stations);
-            ImprovedHeuristic();
-            programStopwatch.Stop();
+            var programStopwatch = System.Diagnostics.Stopwatch.StartNew(); // start stop watch
 
-            AddStamps(initialTimeMinutes);
-            
-            _elapsedTimeMS = (double)programStopwatch.ElapsedMilliseconds;
+            // optimise with level 2
+            if (stations.Count() > 12)
+            {
+                Console.WriteLine("Optimising tour length: Level 2...");
+                _levelSelected = "2";
+                SimpleHeuristic(stations);
+                ImprovedHeuristic();
+            }
+            else // optimise with level 3
+            {
+                Console.WriteLine("Optimising tour length: Level 3...");
+                _levelSelected = "3";
+                ExhaustiveSearch(stations);
+            }
+
+            programStopwatch.Stop(); // stop stopwatch
+
+            AddStamps(initialTimeMinutes); 
+            _elapsedTimeMS = (double)programStopwatch.ElapsedMilliseconds; // save elapsed time
         }
 
+        // add time and refuel stamps for ordered stations
         public void AddStamps(double initalTimeMinutes)
         {
-            double startTime;
-            double endTime = initalTimeMinutes;
+            double startTime; // start time of trip
+            double endTime = initalTimeMinutes; // end time of trip
             foreach (Station visitingStation in _orderedStations)
             {
                 double travelTime = visitingStation.TravelTime;
                 double rangeToTravel = visitingStation.RangeTravelled;
-                startTime = endTime;
+                startTime = endTime; // have start time the  previous end time
+                // refuel plane if cannot make next trip
                 if (_plane.Range - rangeToTravel + 0.00001 < 0)
                 {
                     _plane.RefuelPlane();
@@ -53,7 +67,8 @@ namespace Flying_Postman
                 endTime = startTime + travelTime;
                 visitingStation.AddTripTimes(startTime, endTime);
             }
-            _tourTime = endTime - initalTimeMinutes;
+            // save tour time as difference of last end time and first start time
+            _tourTime = endTime - initalTimeMinutes; 
         }
 
         // Level 1 Tour
@@ -103,71 +118,124 @@ namespace Flying_Postman
             
         } 
 
+        // Level 2 Tour
         public void ImprovedHeuristic()
         {
-            bool changed = true;
-            double newLength;
+            bool changed = true; // flag for if change has been made
             _orderedStations.Add(_orderedStations[0]); // last station (post office) 
 
-            while (changed)
+            while (changed) // loop until no more changes have occured
             {
                 changed = false;
-                double previousTourLength = _tourLength;
-                newLength = _tourLength;
                 
-
+                // loop through all stations
                 for (int i = 1; i < _orderedStations.Count()-1; i++)
                 {
-                    
-                    int bestPosition = i;
-                    double preNewLength = _tourLength;
-
                     Station selectStation = _orderedStations[i];
-                    preNewLength -= selectStation.Distance;
-                    _orderedStations.RemoveAt(i);
+                    int bestPosition = i;
 
+                    double preNewLength = _tourLength; // updates to length pior insertion
+                    
+                    // update preNewLength and update stations around where select station is removed
+                    preNewLength -= selectStation.Distance;
+                    _orderedStations.RemoveAt(i); // remove
                     preNewLength -= _orderedStations[i - 1].Distance;
                     _orderedStations[i - 1].NextTo(_orderedStations[i]);
                     preNewLength += _orderedStations[i - 1].Distance;
 
-                    
+                    // loop through positions to insert
                     for (int n = 1; n < _orderedStations.Count(); n++)
                     {
-                        newLength = preNewLength;
+                        double newLength = preNewLength;
 
+                        // update distances around where station would be inserted
                         double distAhead = TourMath.DistanceBetweenStations(selectStation, _orderedStations[n]);
                         newLength += distAhead;
-                        //_orderedStations.Insert(n, selectStation);
-
                         double prevDistBehind = TourMath.DistanceBetweenStations(_orderedStations[n - 1], _orderedStations[n]);
                         newLength -= prevDistBehind;
                         double currentDistBehind = TourMath.DistanceBetweenStations(_orderedStations[n - 1], selectStation);
-                        newLength += currentDistBehind;
+                        newLength += currentDistBehind; // potential new length
                         
-
+                        // if new length is shorter, update best position and update tour length
                         if (newLength < _tourLength - 0.000001)
                         {
                             bestPosition = n;
                             _tourLength = newLength;
                             changed = true;
-                            Console.WriteLine("{0}", newLength);
                         }
                     }
 
+                    // insert at best position and update stations around it
                     _orderedStations[bestPosition - 1].NextTo(selectStation);
                     selectStation.NextTo(_orderedStations[bestPosition]);
                     _orderedStations.Insert(bestPosition, selectStation);
-                    
                 }
-                
-
             }
             // remove post office from end
             _orderedStations.RemoveAt(_orderedStations.Count() - 1);
+        }
 
+        // Level 3
+        public void ExhaustiveSearch(List<Station> stationsToOrder)
+        {
+            // list for different permutations
+            List<List<Station>> stationsPerms = new List<List<Station>>();
+            // pairing list for lengths of each perm
+            List<double> stationsPermsLength = new List<double>();
             
+            // permutation algorithm
+            void Generate(int k, List<Station> stations)
+            {
+                if (k == 1)
+                {
+                    List<Station> stationsToAdd = new List<Station>(stations);
+                    stationsToAdd.Insert(0, stationsToOrder[0]);
+                    stationsToAdd.Add(stationsToOrder[0]);
+                    stationsPermsLength.Add(TourMath.CalculateDistancesAndFindLength(ref stationsToAdd));
+                    stationsPerms.Add(stationsToAdd);
+                }
+                else
+                {
+                    Generate(k - 1, stations);
+                    for (int i = 0; i < k - 1; i++)
+                    {
+                        if (k % 2 == 0)
+                        {
+                            Station temp1 = stations[i];
+                            Station temp2 = stations[k - 1];
+                            TourMath.SwapStations(ref temp1, ref temp2);
+                            stations[i] = temp1;
+                            stations[k - 1] = temp2;
+                        }
+                        else
+                        {
+                            Station temp1 = stations[0];
+                            Station temp2 = stations[k - 1];
+                            TourMath.SwapStations(ref temp1, ref temp2);
+                            stations[0] = temp1;
+                            stations[k - 1] = temp2;
+                        }
+                        Generate(k - 1, stations);
+                    }
+                }
+            }
+            // run permutation algorithm
+            Generate(stationsToOrder.Count()-1, stationsToOrder.GetRange(1,stationsToOrder.Count()-1));
+
+            // get shortest length and its index in list
+            double minLength = stationsPermsLength.Min();
+            int indexOfMin = stationsPermsLength.IndexOf(minLength);
+
+            // get tour of shortest length and clean it (see TourMath)
+            List<Station> shortestTour = stationsPerms[indexOfMin];
+            TourMath.CleanUpPermutation(ref shortestTour);
+            shortestTour.RemoveAt(shortestTour.Count() - 1);
+            
+            _orderedStations = new List<Station>(shortestTour);
+            _tourLength = minLength;
         }
         
+        // methods to return tour properties
         public List<Station> OrderedStations { get { return _orderedStations; } }
         public double TourLength { get { return _tourLength; } }
         public double TourTime { get { return _tourTime; } }
